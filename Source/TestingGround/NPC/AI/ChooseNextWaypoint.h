@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "ChooseNextWaypointBTTaskNode.generated.h"
+#include "ChooseNextWaypoint.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TESTINGGROUND_API UChooseNextWaypointBTTaskNode : public UBTTaskNode
+class TESTINGGROUND_API UChooseNextWaypoint : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
