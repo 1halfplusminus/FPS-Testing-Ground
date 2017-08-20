@@ -21,7 +21,7 @@ EBTNodeResult::Type UChooseNextWaypointBTTaskNode::ExecuteTask(UBehaviorTreeComp
 	{
 		AActor* Waypoint = PatrollingComponent->Next();
 		Blackboard->SetValueAsObject(WaypointKey.SelectedKeyName, Waypoint);
-		Blackboard->SetValueAsInt(IndexKey.SelectedKeyName, PatrollingComponent->GetCurrentIndex());
+		Blackboard->SetValueAsInt(IndexKey.SelectedKeyName, PatrollingComponent->GetCurrentIndex());                                  
 	}
 	return EBTNodeResult::Succeeded;
 }
