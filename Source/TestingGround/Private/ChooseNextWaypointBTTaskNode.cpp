@@ -4,7 +4,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "AIController.h"
-#include "PatrollingGuard.h"
+#include "PatrollingRouteComponent.h"
 
 EBTNodeResult::Type UChooseNextWaypointBTTaskNode::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
@@ -12,28 +12,16 @@ EBTNodeResult::Type UChooseNextWaypointBTTaskNode::ExecuteTask(UBehaviorTreeComp
 	AAIController* Controller = OwnerComp.GetAIOwner();
 
 	// Check if the possed pawn is a patrolling guard
-	APatrollingGuard* PossesedPawn = Cast<APatrollingGuard>(Controller->GetPawn());
+	AActor* PossesedPawn = Controller->GetPawn();
 	if (!PossesedPawn) { return EBTNodeResult::Aborted; }
-	else 
+	UPatrollingRouteComponent* PatrollingComponent = PossesedPawn->FindComponentByClass<UPatrollingRouteComponent>();
+	if(!PatrollingComponent) { return EBTNodeResult::Aborted;  }
+	// Get the waypoint of the patrolling component
+	if (PatrollingComponent->CanPatrol())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NOT A PATTROLING GUARD"))
-	}
-	
-	// Get the waypoint of the patrollingGuard
-	TArray<AActor*> Waypoints = PossesedPawn->PatrollingPoint;
-	if (Waypoints.Num() != 0)
-	{
-		int32 CurrentWaypointIndex = Blackboard->GetValueAsInt(IndexKey.SelectedKeyName);
-		AActor* Waypoint = Waypoints[CurrentWaypointIndex];
-		// Find the next waypoitn index
-		int32 NextWaypointIndex = (CurrentWaypointIndex+1) % Waypoints.Num();
-
-		//Update the blackboard
+		AActor* Waypoint = PatrollingComponent->Next();
 		Blackboard->SetValueAsObject(WaypointKey.SelectedKeyName, Waypoint);
-		Blackboard->SetValueAsInt(IndexKey.SelectedKeyName, NextWaypointIndex); // The current index is now the previous index + 1
-
-		UE_LOG(LogTemp, Warning, TEXT("HERE"))
+		Blackboard->SetValueAsInt(IndexKey.SelectedKeyName, PatrollingComponent->GetCurrentIndex());
 	}
-
 	return EBTNodeResult::Succeeded;
 }
