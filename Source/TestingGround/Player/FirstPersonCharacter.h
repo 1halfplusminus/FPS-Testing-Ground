@@ -23,8 +23,9 @@ class AFirstPersonCharacter : public ACharacter
 	
 	/** Type of gun used by the player */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	TSubclassOf<class AGun> Gun;
+	TSubclassOf<class AGun> GunBlueprint;
 
+	class AGun* Gun;
 public:
 	AFirstPersonCharacter();
 
