@@ -18,6 +18,7 @@ public:
 	virtual void DrawHUD() override;
 
 private:
+	UPROPERTY(EditDefaultsOnly)
 	/** Crosshair asset pointer */
 	class UTexture2D* CrosshairTex;
 

@@ -11,15 +11,13 @@ ATestingGroundHUD::ATestingGroundHUD()
 {
 	// TODO Remove asset hard reference
 	// Set the crosshair texture
-	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("/Game/Player/Textures/FirstPersonCrosshair"));
-	CrosshairTex = CrosshairTexObj.Object;
 }
 
 
 void ATestingGroundHUD::DrawHUD()
 {
 	Super::DrawHUD();
-
+	check((CrosshairTex != nullptr && "You forget to set the crosshair texture"))
 	// Draw very simple crosshair
 
 	// find center of the Canvas
