@@ -17,9 +17,10 @@ ATestingGroundCharacter::ATestingGroundCharacter()
 	
 	GetMesh()->bOwnerNoSee = true;
 
+	// Setup spring arms for Third player camera
 	TPCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	TPCameraBoom->SetupAttachment(RootComponent);
-
+	
 	TPCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	TPCamera->bAutoActivate = false;
 	TPCamera->bUsePawnControlRotation = false;
@@ -65,10 +66,10 @@ void ATestingGroundCharacter::Tick(float DeltaTime)
 void ATestingGroundCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	PlayerInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this, &ATestingGroundCharacter::PullTrigger);
 }
 
-void ATestingGroundCharacter::Fire()
+void ATestingGroundCharacter::PullTrigger()
 {
 	if (Gun)
 	{

@@ -27,7 +27,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
-	void Fire();
+	void PullTrigger();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsDead();
