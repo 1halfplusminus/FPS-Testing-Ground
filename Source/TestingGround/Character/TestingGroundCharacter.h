@@ -26,6 +26,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void UnPossessed() override;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+
 	UFUNCTION(BlueprintCallable)
 	void PullTrigger();
 
@@ -44,7 +48,7 @@ protected:
 	class UCameraComponent* FPCamera;
 	/** Mesh for the first person view */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
-	class USkeletalMeshComponent* FPArms;
+	class USkeletalMeshComponent* FPMesh;
 	/** Class used to spawn the player gun */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gun")
 	TSubclassOf<class AGun> GunTemplate;

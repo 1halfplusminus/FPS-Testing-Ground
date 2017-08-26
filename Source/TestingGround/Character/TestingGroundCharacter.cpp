@@ -8,6 +8,7 @@
 #include "Weapons/Gun.h"
 #include "SubclassOf.h"
 #include "Animation/AnimInstance.h"
+#include "GameFramework/Controller.h"
 
 // Sets default values
 ATestingGroundCharacter::ATestingGroundCharacter()
@@ -32,11 +33,11 @@ ATestingGroundCharacter::ATestingGroundCharacter()
 	FPCamera->bUsePawnControlRotation =  true;
 	FPCamera->SetupAttachment(RootComponent);
 
-	FPArms = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPArms"));
-	FPArms->SetOnlyOwnerSee(true);
-	FPArms->CastShadow = false;
-	FPArms->bCastDynamicShadow = false;
-	FPArms->SetupAttachment(FPCamera);
+	FPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPArms"));
+	FPMesh->SetOnlyOwnerSee(true);
+	FPMesh->CastShadow = false;
+	FPMesh->bCastDynamicShadow = false;
+	FPMesh->SetupAttachment(FPCamera);
 
 	// Default value
 	Health = 100;
@@ -51,7 +52,7 @@ void ATestingGroundCharacter::BeginPlay()
 		Gun = GetWorld()->SpawnActor<AGun>(GunTemplate);
 		if (IsPlayerControlled())
 		{
-			Gun->AttachToComponent(FPArms, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+			Gun->AttachToComponent(FPMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 		}
 		else
 		{
@@ -73,17 +74,39 @@ void ATestingGroundCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	PlayerInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this, &ATestingGroundCharacter::PullTrigger);
 }
 
+
+void ATestingGroundCharacter::UnPossessed()
+{
+	Super::UnPossessed();
+	if (Gun)
+	{
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	}
+}
+
+float  ATestingGroundCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Health = FMath::Max<int32>(Health - DamageAmount,0);
+	if (IsDead() && IsControlled())
+	{
+		GetController()->UnPossess();
+		FPMesh->SetVisibility(false, true);
+	}
+	return Health;
+}
+
 void ATestingGroundCharacter::PullTrigger()
 {
 	if (Gun)
 	{
 		Gun->OnFire();
-		UAnimInstance* AnimInstance = (IsPlayerControlled()) ? FPArms->GetAnimInstance() : GetMesh()->GetAnimInstance();
+		UAnimInstance* AnimInstance = (IsPlayerControlled()) ? FPMesh->GetAnimInstance() : GetMesh()->GetAnimInstance();
 		UAnimMontage*  FireAnimation = (IsPlayerControlled()) ? FPFireAnimation :TPFireAnimation;
 		// try and play a firing animation if specified
 		if (FireAnimation != NULL)
 		{
-			//Get the animation object for the arms mesh
+			//Get the animation object for the mesh
 			if (AnimInstance != NULL)
 			{
 				AnimInstance->Montage_Play(FireAnimation, 1.f);
