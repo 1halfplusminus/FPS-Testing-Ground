@@ -15,15 +15,12 @@ class TESTINGGROUND_API AGun : public AActor
 	UPROPERTY(VisibleDefaultsOnly, Category = "Mesh")
 	class USkeletalMeshComponent* FP_Gun;
 
-	/** Location on gun mesh where projectiles should spawn. */
-	UPROPERTY(VisibleDefaultsOnly, Category = "Mesh")
-	class USceneComponent* FP_MuzzleLocation;
 public:	
 	// Sets default values for this actor's properties
 	AGun();
 	
 	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Projectile")
 	TSubclassOf<class AProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
@@ -41,6 +38,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	/** Location on gun mesh where projectiles should spawn. */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Mesh")
+	class USceneComponent* FP_MuzzleLocation;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
