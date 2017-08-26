@@ -26,15 +26,6 @@ public:
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 	class USoundBase* FireSound;
-
-	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
-	class UAnimMontage* FireAnimation;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "Animation")
-	/** Anime instance play when we fire */
-	class UAnimInstance* AnimInstance;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

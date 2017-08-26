@@ -2,7 +2,6 @@
 
 #include "Gun.h"
 #include "Projectile.h"
-#include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 
@@ -62,15 +61,5 @@ void AGun::OnFire()
 	if (FireSound != NULL)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		//Get the animation object for the arms mesh
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
 	}
 }

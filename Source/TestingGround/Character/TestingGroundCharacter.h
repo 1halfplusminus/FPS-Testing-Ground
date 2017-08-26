@@ -52,6 +52,13 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Gun")
 	class AGun* Gun;
 
+	/** AnimMontage to play for the first person*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup", meta = (DisplayName = "Third Person Animation"))
+	class UAnimMontage* TPFireAnimation;
+
+	/** AnimMontage to play for the third person*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup", meta = (DisplayName = "First Person Animation"))
+	class UAnimMontage* FPFireAnimation;
 protected:
 
 	/** Represent the life of the character */

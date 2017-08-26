@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Weapons/Gun.h"
 #include "SubclassOf.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 ATestingGroundCharacter::ATestingGroundCharacter()
@@ -48,10 +49,13 @@ void ATestingGroundCharacter::BeginPlay()
 	if (GunTemplate)
 	{
 		Gun = GetWorld()->SpawnActor<AGun>(GunTemplate);
-		if(Gun)
+		if (IsPlayerControlled())
 		{
-			Gun->AttachToComponent(FPArms, FAttachmentTransformRules(EAttachmentRule::SnapToTarget,true), TEXT("GripPoint"));
-			Gun->AnimInstance = FPArms->GetAnimInstance();
+			Gun->AttachToComponent(FPArms, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+		}
+		else
+		{
+			Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 		}
 	}
 }
@@ -74,6 +78,17 @@ void ATestingGroundCharacter::PullTrigger()
 	if (Gun)
 	{
 		Gun->OnFire();
+		UAnimInstance* AnimInstance = (IsPlayerControlled()) ? FPArms->GetAnimInstance() : GetMesh()->GetAnimInstance();
+		UAnimMontage*  FireAnimation = (IsPlayerControlled()) ? FPFireAnimation :TPFireAnimation;
+		// try and play a firing animation if specified
+		if (FireAnimation != NULL)
+		{
+			//Get the animation object for the arms mesh
+			if (AnimInstance != NULL)
+			{
+				AnimInstance->Montage_Play(FireAnimation, 1.f);
+			}
+		}
 	}
 }
 
