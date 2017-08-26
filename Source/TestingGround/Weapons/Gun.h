@@ -42,6 +42,7 @@ protected:
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Mesh")
 	class USceneComponent* FP_MuzzleLocation;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
