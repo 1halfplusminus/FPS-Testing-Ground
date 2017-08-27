@@ -23,7 +23,7 @@ public:
 	class UArrowComponent* MaxSpawnPoint;
 
 	UFUNCTION(BlueprintCallable,Category="Setup")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSpawn, float Radius = 500.0f);
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSpawn, float MinScale = 1.0f,float MaxScale= 1.0f,float CollisionRadius = 500.0f);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,7 +36,7 @@ private:
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
 	//Place an actor in the world
-	void PlaceActor(TSubclassOf<AActor> ToSpawn,FVector Location);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn,FVector Location,float YawRotation, float Scale);
 
 	// Get a empty location
 	bool FindEmptyLocation(float Radius,FVector& OutLocation);

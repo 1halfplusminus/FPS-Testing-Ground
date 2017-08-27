@@ -10,7 +10,7 @@
 ATile::ATile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(FName("Shared Root")));
 
@@ -34,16 +34,18 @@ void ATile::Tick(float DeltaTime)
 
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,int32 MinSpawn,int32 MaxSpawn,float Radius)
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,int32 MinSpawn,int32 MaxSpawn, float MinScale, float MaxScale,float CollisionRadius)
 {
 	int32 NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
 
 	for (int32 ActorCount = 0; ActorCount <= NumberToSpawn; ActorCount++)
 	{
 		FVector Location;
-		if (FindEmptyLocation(Radius, Location))
+		float RandomScale = FMath::RandRange(MinScale, MaxScale);
+		if (FindEmptyLocation(CollisionRadius * RandomScale, Location))
 		{
-			PlaceActor(ToSpawn, Location);
+			float RandomRotation = FMath::RandRange(-100.0f,100.0f);
+			PlaceActor(ToSpawn, Location, RandomRotation,RandomScale);
 		}
 	}
 }
@@ -74,13 +76,15 @@ bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 	return !HasHit;
 }
 
-void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector Location)
+void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector Location, float YawRotation,float Scale)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
 	if (Spawned)
 	{
 		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 		Spawned->SetActorRelativeLocation(Location);
+		Spawned->SetActorRotation(FRotator(0,YawRotation,0));
+		Spawned->SetActorScale3D(FVector(Scale));
 	}
 }
 
