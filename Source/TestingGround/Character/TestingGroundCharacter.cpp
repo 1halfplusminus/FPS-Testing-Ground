@@ -89,7 +89,6 @@ void ATestingGroundCharacter::UnPossessed()
 void  ATestingGroundCharacter::OnDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
 	Health = FMath::Max<int32>(Health - Damage,0);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Damage"));
 	if (IsDead())
 	{ 
 		DetachFromControllerPendingDestroy();

@@ -23,7 +23,7 @@ public:
 	class UArrowComponent* MaxSpawnPoint;
 
 	UFUNCTION(BlueprintCallable,Category="Setup")
-	void PlaceActors();
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSpawn);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,7 +31,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	
-	
+private:
+	// Cast a sphere and return true if the sphere hit a object
+	bool CastSphere(FVector Location, float Radius);
 };
