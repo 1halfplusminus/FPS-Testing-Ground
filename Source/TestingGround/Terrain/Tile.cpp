@@ -7,7 +7,6 @@
 #include "SubclassOf.h"
 #include "DrawDebugHelpers.h"
 
-
 // Sets default values
 ATile::ATile()
 {
@@ -18,16 +17,19 @@ ATile::ATile()
 
 	MinSpawnPoint = CreateDefaultSubobject<UArrowComponent>(FName("FBox Min"));
 	MinSpawnPoint->SetupAttachment(RootComponent);
+
 	MaxSpawnPoint = CreateEditorOnlyDefaultSubobject<UArrowComponent>(FName("FBox Max"));
 	MaxSpawnPoint->SetupAttachment(RootComponent);
 
+	AttachLocation = CreateEditorOnlyDefaultSubobject<UArrowComponent>(FName("Attach Location"));
+	AttachLocation->SetupAttachment(RootComponent);
+	AttachLocation->SetRelativeLocation(FVector(3675.0f,0.0f,0.0f));
 }
 
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
@@ -35,6 +37,11 @@ void ATile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+FTransform ATile::GetAttachLocation()
+{
+	return AttachLocation->GetComponentTransform();
 }
 
 void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,int32 MinSpawn,int32 MaxSpawn, float MinScale, float MaxScale,float CollisionRadius)

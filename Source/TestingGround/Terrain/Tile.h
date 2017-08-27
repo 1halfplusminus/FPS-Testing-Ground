@@ -21,6 +21,9 @@ public:
 	// Max of the box for spawning props
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	class UArrowComponent* MaxSpawnPoint;
+	// Where the tile gonna be attach
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	class UArrowComponent* AttachLocation;
 
 	UFUNCTION(BlueprintCallable,Category="Setup")
 	void PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSpawn, float MinScale = 1.0f,float MaxScale= 1.0f,float CollisionRadius = 500.0f);
@@ -30,6 +33,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable)
+	FTransform GetAttachLocation();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void UnLock();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void Lock();
 private:
 	// Cast a sphere and return true if the sphere hit a object
 	bool CanSpawnAtLocation(FVector Location, float Radius);

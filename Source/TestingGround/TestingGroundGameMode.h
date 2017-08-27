@@ -13,6 +13,22 @@ class ATestingGroundGameMode : public AGameModeBase
 
 public:
 	ATestingGroundGameMode();
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Setup")
+	TSubclassOf<class ATile> TileBlueprint;
+
+	UFUNCTION(BlueprintCallable)
+	class ATile* SpawnTile();
+
+	UFUNCTION(BlueprintCallable,Category= "Bounds Pool")
+	void PopulateBoundsVolumePool();
+
+protected:
+	virtual void BeginPlay() override;
+private:
+	FTransform NextTileTransform = FTransform::Identity;
+
+	void AddToPool(class ANavMeshBoundsVolume* VolumeToAdd);
 };
 
 
