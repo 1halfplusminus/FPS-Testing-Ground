@@ -34,44 +34,69 @@ void ATile::Tick(float DeltaTime)
 
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,int32 MinSpawn,int32 MaxSpawn)
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,int32 MinSpawn,int32 MaxSpawn,float Radius)
 {
 	int32 NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
-	FBox Bounds = FBox(MinSpawnPoint->RelativeLocation, MaxSpawnPoint->RelativeLocation);
+
 	for (int32 ActorCount = 0; ActorCount <= NumberToSpawn; ActorCount++)
 	{
-		FVector SpawnPoint = FMath::RandPointInBox(Bounds);
-		AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
-		if (Spawned)
+		FVector Location;
+		if (FindEmptyLocation(Radius, Location))
 		{
-			Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-			Spawned->SetActorRelativeLocation(SpawnPoint);
-			CastSphere(SpawnPoint, 300);
+			PlaceActor(ToSpawn, Location);
 		}
 	}
 }
 
-bool  ATile::CastSphere(FVector Location, float Radius)
+bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 {
 	FHitResult HitResult;
-
-	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, 
-		Location, 
-		Location, 
+	FVector GlobalPosition = ActorToWorld().TransformPosition(Location);
+	bool HasHit = GetWorld()->SweepSingleByChannel(
+		HitResult, 
+		GlobalPosition,
+		GlobalPosition,
 		FQuat::Identity, 
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(Radius)
 	);
 
 	FColor ResultColor = (HasHit)?FColor::Red: FColor::Green;
-	DrawDebugSphere(
-		GetWorld(),
-		Location,
-		Radius,
-		34,
-		ResultColor,
-		true,
-		100
-	);
-	return HasHit;
+	//DrawDebugSphere(
+	//	GetWorld(),
+	//	GlobalPosition,
+	//	Radius,
+	//	12,
+	//	ResultColor,
+	//	true,
+	//	100
+	//);
+	return !HasHit;
+}
+
+void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector Location)
+{
+	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
+	if (Spawned)
+	{
+		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		Spawned->SetActorRelativeLocation(Location);
+	}
+}
+
+bool ATile::FindEmptyLocation(float Radius, FVector &OutLocation)
+{
+	FBox Bounds = FBox(MinSpawnPoint->RelativeLocation, MaxSpawnPoint->RelativeLocation);
+	const int MAX_ATTEMPS = 20;
+	for (size_t NbOfAttemp = 0; NbOfAttemp < MAX_ATTEMPS; NbOfAttemp++)
+	{
+		FVector SpawnPoint = FMath::RandPointInBox(Bounds);
+		if (CanSpawnAtLocation(SpawnPoint, Radius))
+		{
+			OutLocation = SpawnPoint;
+			return true;
+		}
+	}
+
+	return false;
 }
