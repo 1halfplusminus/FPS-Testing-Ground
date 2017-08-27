@@ -10,6 +10,8 @@
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Controller.h"
 
+#include "EngineGlobals.h"
+#include "Engine/Engine.h"
 // Sets default values
 ATestingGroundCharacter::ATestingGroundCharacter()
 {
@@ -38,7 +40,6 @@ ATestingGroundCharacter::ATestingGroundCharacter()
 	FPMesh->CastShadow = false;
 	FPMesh->bCastDynamicShadow = false;
 	FPMesh->SetupAttachment(FPCamera);
-
 	// Default value
 	Health = 100;
 }
@@ -47,6 +48,7 @@ ATestingGroundCharacter::ATestingGroundCharacter()
 void ATestingGroundCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	OnTakeAnyDamage.AddDynamic(this, &ATestingGroundCharacter::OnDamage);
 	if (GunTemplate)
 	{
 		Gun = GetWorld()->SpawnActor<AGun>(GunTemplate);
@@ -84,16 +86,15 @@ void ATestingGroundCharacter::UnPossessed()
 	}
 }
 
-float  ATestingGroundCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+void  ATestingGroundCharacter::OnDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	Health = FMath::Max<int32>(Health - DamageAmount,0);
-	if (IsDead() && IsControlled())
-	{
-		GetController()->UnPossess();
+	Health = FMath::Max<int32>(Health - Damage,0);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Damage"));
+	if (IsDead())
+	{ 
+		DetachFromControllerPendingDestroy();
 		FPMesh->SetVisibility(false, true);
 	}
-	return Health;
 }
 
 void ATestingGroundCharacter::PullTrigger()
