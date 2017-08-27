@@ -6,10 +6,12 @@
 #include "Engine/World.h"
 #include "SubclassOf.h"
 #include "DrawDebugHelpers.h"
+
+
 // Sets default values
 ATile::ATile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(FName("Shared Root")));
@@ -18,6 +20,7 @@ ATile::ATile()
 	MinSpawnPoint->SetupAttachment(RootComponent);
 	MaxSpawnPoint = CreateEditorOnlyDefaultSubobject<UArrowComponent>(FName("FBox Max"));
 	MaxSpawnPoint->SetupAttachment(RootComponent);
+
 }
 
 // Called when the game starts or when spawned
