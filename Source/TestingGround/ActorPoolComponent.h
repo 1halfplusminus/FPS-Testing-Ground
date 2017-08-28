@@ -21,4 +21,8 @@ public:
 	void Return(class AActor*);
 
 	void Add(class AActor*);
+
+private:
+
+	TArray<class AActor*> Pool;
 };

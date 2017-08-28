@@ -39,13 +39,13 @@ ATile* ATestingGroundGameMode::SpawnTile()
 void ATestingGroundGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	PopulateBoundsVolumePool();
 	ATile* CurrentTile = SpawnTile();
 	if (CurrentTile)
 	{
 		CurrentTile->UnLock();
 	}
 	SpawnTile();
-	PopulateBoundsVolumePool();
 }
 
 void ATestingGroundGameMode::AddToPool(ANavMeshBoundsVolume *NavMeshBoundsVolume)

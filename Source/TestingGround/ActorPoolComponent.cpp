@@ -12,24 +12,29 @@ UActorPoolComponent::UActorPoolComponent()
 
 }
 AActor * UActorPoolComponent::Checkout()
-{
-	AActor* Outer = NewObject<AActor>((UObject*)GetTransientPackage(), FName("Test Actor"));
-	return Outer;
+{	
+	if (ensure(Pool.Num()  > 0 ))
+	{
+		AActor* Actor = Pool.Pop();
+		return Actor;
+	}
+	UE_LOG(LogTemp, Error, TEXT("Not enough actor in the pool"))
+	return nullptr;
 }
 
-void UActorPoolComponent::Return(AActor * ToReturn)
+void UActorPoolComponent::Return(AActor* ToReturn)
 {
 	check(ToReturn != nullptr)
 	if (ToReturn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Actor return to the pool %s"), *ToReturn->GetName())
+		Pool.Add(ToReturn);
 	}
 }
-void UActorPoolComponent::Add(AActor * ToAdd)
+void UActorPoolComponent::Add(AActor* ToAdd)
 {
 	check(ToAdd != nullptr)
 	if (ToAdd)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Actor added to the pool %s"), *ToAdd->GetName())
+		Pool.Add(ToAdd);
 	}
 }
