@@ -33,14 +33,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Get the next title attachement point
 	UFUNCTION(BlueprintCallable)
-	FTransform GetAttachLocation();
+	FTransform GetAttachLocation() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void UnLock();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void Lock();
+
+	void SetActorPool(class UActorPoolComponent*);
 private:
 	// Cast a sphere and return true if the sphere hit a object
 	bool CanSpawnAtLocation(FVector Location, float Radius);
@@ -50,4 +54,7 @@ private:
 
 	// Get a empty location
 	bool FindEmptyLocation(float Radius,FVector& OutLocation);
+
+	// Reference to the actor pool singleton
+	class UActorPoolComponent* ActorPool;
 };

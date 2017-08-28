@@ -14,7 +14,7 @@ class ATestingGroundGameMode : public AGameModeBase
 public:
 	ATestingGroundGameMode();
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Setup")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Classes",meta = (DisplayName = "Tile Class"))
 	TSubclassOf<class ATile> TileBlueprint;
 
 	UFUNCTION(BlueprintCallable)
@@ -26,9 +26,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 private:
+
+	//Next tile world transform
 	FTransform NextTileTransform = FTransform::Identity;
 
+	class UActorPoolComponent* ActorPool;
 	void AddToPool(class ANavMeshBoundsVolume* VolumeToAdd);
+
 };
 
 

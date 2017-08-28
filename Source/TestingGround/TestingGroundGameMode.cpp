@@ -6,10 +6,12 @@
 #include "Terrain/Tile.h"
 #include "AI/Navigation/NavMeshBoundsVolume.h"
 #include "EngineUtils.h"
+#include "ActorPoolComponent.h"
 
 ATestingGroundGameMode::ATestingGroundGameMode()
 	: Super()
 {
+	ActorPool = CreateDefaultSubobject<UActorPoolComponent>(FName("NavMeshBoundVolume Pool"));
 }
 
 ATile* ATestingGroundGameMode::SpawnTile()
@@ -22,6 +24,8 @@ ATile* ATestingGroundGameMode::SpawnTile()
 			ATile* Tile = GetWorld()->SpawnActor<ATile>(TileBlueprint);
 			if (Tile)
 			{
+				//Give the reference of the actor pool to the tile
+				Tile->SetActorPool(ActorPool);
 				Tile->SetActorTransform(NextTileTransform);
 				NextTileTransform = Tile->GetAttachLocation();
 				Tile->Lock();
@@ -40,6 +44,7 @@ void ATestingGroundGameMode::BeginPlay()
 		CurrentTile->UnLock();
 	}
 	SpawnTile();
+	PopulateBoundsVolumePool();
 }
 
 void ATestingGroundGameMode::AddToPool(ANavMeshBoundsVolume *NavMeshBoundsVolume)

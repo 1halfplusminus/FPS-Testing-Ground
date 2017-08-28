@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "SubclassOf.h"
 #include "DrawDebugHelpers.h"
+#include "ActorPoolComponent.h"
 
 // Sets default values
 ATile::ATile()
@@ -39,7 +40,13 @@ void ATile::Tick(float DeltaTime)
 
 }
 
-FTransform ATile::GetAttachLocation()
+void ATile::SetActorPool(UActorPoolComponent* ActorPoolToSet)
+{
+	check(ActorPoolToSet != nullptr)
+	ActorPool = ActorPoolToSet;
+}
+
+FTransform ATile::GetAttachLocation() const
 {
 	return AttachLocation->GetComponentTransform();
 }
@@ -101,6 +108,7 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector Location, float YawR
 bool ATile::FindEmptyLocation(float Radius, FVector &OutLocation)
 {
 	FBox Bounds = FBox(MinSpawnPoint->RelativeLocation, MaxSpawnPoint->RelativeLocation);
+	//TODO PUT CONST IN HEADER FILE ?
 	const int MAX_ATTEMPS = 20;
 	for (size_t NbOfAttemp = 0; NbOfAttemp < MAX_ATTEMPS; NbOfAttemp++)
 	{
