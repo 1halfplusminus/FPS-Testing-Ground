@@ -7,6 +7,7 @@
 #include "SubclassOf.h"
 #include "DrawDebugHelpers.h"
 #include "ActorPoolComponent.h"
+#include "AI/Navigation/NavigationSystem.h"
 
 // Sets default values
 ATile::ATile()
@@ -61,6 +62,7 @@ void ATile::PositionNavMeshBoundsVolume()
 		if (NavMeshBoundsVolume)
 		{
 			NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
+			GetWorld()->GetNavigationSystem()->Build();
 		}
 	}
 }

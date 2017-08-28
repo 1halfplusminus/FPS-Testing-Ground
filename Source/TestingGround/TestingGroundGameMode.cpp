@@ -46,6 +46,7 @@ void ATestingGroundGameMode::BeginPlay()
 		CurrentTile->UnLock();
 	}
 	SpawnTile();
+	SpawnTile();
 }
 
 void ATestingGroundGameMode::AddToPool(ANavMeshBoundsVolume *NavMeshBoundsVolume)
