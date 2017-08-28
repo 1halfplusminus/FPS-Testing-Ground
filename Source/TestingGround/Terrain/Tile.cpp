@@ -14,6 +14,9 @@ ATile::ATile()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	ActorPool = nullptr;
+	NavMeshBoundsVolume = nullptr;
+
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(FName("Shared Root")));
 
 	MinSpawnPoint = CreateDefaultSubobject<UArrowComponent>(FName("FBox Min"));
@@ -33,11 +36,33 @@ void ATile::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	if (ActorPool && NavMeshBoundsVolume) {
+		ActorPool->Return(NavMeshBoundsVolume);
+	}
+	UE_LOG(LogTemp,Warning,TEXT("[%s] EndPlay"),*GetName());
+}
+
 // Called every frame
 void ATile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATile::PositionNavMeshBoundsVolume()
+{
+	check(ActorPool != nullptr)
+	if (ActorPool)
+	{
+		NavMeshBoundsVolume = ActorPool->Checkout();
+		if (NavMeshBoundsVolume)
+		{
+			NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
+		}
+	}
 }
 
 void ATile::SetActorPool(UActorPoolComponent* ActorPoolToSet)

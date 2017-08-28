@@ -30,6 +30,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -45,6 +47,8 @@ public:
 	void Lock();
 
 	void SetActorPool(class UActorPoolComponent*);
+
+	void PositionNavMeshBoundsVolume();
 private:
 	// Cast a sphere and return true if the sphere hit a object
 	bool CanSpawnAtLocation(FVector Location, float Radius);
@@ -57,4 +61,7 @@ private:
 
 	// Reference to the actor pool singleton
 	class UActorPoolComponent* ActorPool;
+
+	// reference to the NavMeshBoundsVolume get from the pool. This thing need to be returned on end play
+	class AActor* NavMeshBoundsVolume;
 };

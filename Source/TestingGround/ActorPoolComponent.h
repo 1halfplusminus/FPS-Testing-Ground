@@ -18,7 +18,7 @@ public:
 
 	class AActor* Checkout();
 	
-	void Return(class AActor* toReturn);
+	void Return(class AActor*);
 
-	void Add(class AActor* toAdd);
+	void Add(class AActor*);
 };

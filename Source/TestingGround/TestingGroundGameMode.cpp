@@ -27,8 +27,9 @@ ATile* ATestingGroundGameMode::SpawnTile()
 				//Give the reference of the actor pool to the tile
 				Tile->SetActorPool(ActorPool);
 				Tile->SetActorTransform(NextTileTransform);
-				NextTileTransform = Tile->GetAttachLocation();
 				Tile->Lock();
+				Tile->PositionNavMeshBoundsVolume();
+				NextTileTransform = Tile->GetAttachLocation();
 			}
 			return Tile;
 		}
@@ -49,7 +50,10 @@ void ATestingGroundGameMode::BeginPlay()
 
 void ATestingGroundGameMode::AddToPool(ANavMeshBoundsVolume *NavMeshBoundsVolume)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Found NavMesh: %s"), *NavMeshBoundsVolume->GetName())
+	if (ActorPool)
+	{
+		ActorPool->Add(NavMeshBoundsVolume);
+	}
 }
 
 void ATestingGroundGameMode::PopulateBoundsVolumePool()
