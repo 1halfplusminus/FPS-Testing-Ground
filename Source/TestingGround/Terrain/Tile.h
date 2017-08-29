@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "SpawnParams.h"
 #include "Tile.generated.h"
 
 UCLASS()
@@ -26,7 +27,7 @@ public:
 	class UArrowComponent* AttachLocation;
 
 	UFUNCTION(BlueprintCallable,Category="Setup")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn, int32 MaxSpawn, float MinScale = 1.0f,float MaxScale= 1.0f,float CollisionRadius = 500.0f);
+	void PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnParams);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -49,12 +50,15 @@ public:
 	void SetActorPool(class UActorPoolComponent*);
 
 	void PositionNavMeshBoundsVolume();
+
+	TArray<FTransform> GenerateSpawnPosition(const FSpawnParams&);
+
 private:
 	// Cast a sphere and return true if the sphere hit a object
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
 	//Place an actor in the world
-	void PlaceActor(TSubclassOf<AActor> ToSpawn,FVector Location,float YawRotation, float Scale);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, const struct FTransform&);
 
 	// Get a empty location
 	bool FindEmptyLocation(float Radius,FVector& OutLocation);

@@ -78,19 +78,11 @@ FTransform ATile::GetAttachLocation() const
 	return AttachLocation->GetComponentTransform();
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,int32 MinSpawn,int32 MaxSpawn, float MinScale, float MaxScale,float CollisionRadius)
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnParams)
 {
-	int32 NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
-
-	for (int32 ActorCount = 0; ActorCount <= NumberToSpawn; ActorCount++)
+	for(const FTransform& SpawnPosition : GenerateSpawnPosition(SpawnParams))
 	{
-		FVector Location;
-		float RandomScale = FMath::RandRange(MinScale, MaxScale);
-		if (FindEmptyLocation(CollisionRadius * RandomScale, Location))
-		{
-			float RandomRotation = FMath::RandRange(-100.0f,100.0f);
-			PlaceActor(ToSpawn, Location, RandomRotation,RandomScale);
-		}
+		PlaceActor(ToSpawn, SpawnPosition);
 	}
 }
 
@@ -120,15 +112,13 @@ bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 	return !HasHit;
 }
 
-void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector Location, float YawRotation,float Scale)
+void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn,const FTransform& SpawnPosition)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
 	if (Spawned)
 	{
 		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-		Spawned->SetActorRelativeLocation(Location);
-		Spawned->SetActorRotation(FRotator(0,YawRotation,0));
-		Spawned->SetActorScale3D(FVector(Scale));
+		Spawned->SetActorTransform(SpawnPosition);
 	}
 }
 
@@ -148,4 +138,29 @@ bool ATile::FindEmptyLocation(float Radius, FVector &OutLocation)
 	}
 
 	return false;
+}
+
+TArray<FTransform> ATile::GenerateSpawnPosition(const FSpawnParams& SpawnParam)
+{
+	TArray<FTransform> SpawnPoints;
+	int32 NumberToSpawn = FMath::RandRange(SpawnParam.MinSpawn, SpawnParam.MaxSpawn);
+	for (int32 ActorCount = 0; ActorCount < NumberToSpawn; ActorCount++)
+	{
+		FVector Location;
+		FRotator Rot;
+		Rot.Roll = FMath::RandRange(SpawnParam.MinTransform.Rotation.Roll, SpawnParam.MaxTransform.Rotation.Roll);
+		Rot.Pitch = FMath::RandRange(SpawnParam.MinTransform.Rotation.Pitch,SpawnParam.MaxTransform.Rotation.Pitch);
+		Rot.Yaw = FMath::RandRange(SpawnParam.MinTransform.Rotation.Yaw, SpawnParam.MaxTransform.Rotation.Yaw);
+		FVector Scale;
+		Scale.X = FMath::RandRange(SpawnParam.MinTransform.Scale.X, SpawnParam.MaxTransform.Scale.X);
+		Scale.Y = FMath::RandRange(SpawnParam.MinTransform.Scale.Y, SpawnParam.MaxTransform.Scale.Y);
+		Scale.Z = FMath::RandRange(SpawnParam.MinTransform.Scale.Z, SpawnParam.MaxTransform.Scale.Z);
+		FTransform SpawnPosition(Rot,Location,Scale);
+		if (FindEmptyLocation(SpawnParam.CollisionRadius * SpawnPosition.GetScale3D().GetMax(), Location))
+		{
+			SpawnPosition.SetLocation(Location);
+			SpawnPoints.Add(SpawnPosition);
+		}
+	}
+	return SpawnPoints;
 }
