@@ -26,8 +26,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	class UArrowComponent* AttachLocation;
 
-	UFUNCTION(BlueprintCallable,Category="Setup")
+	//Places Actors in the world
+	UFUNCTION(BlueprintCallable,Category="Spawning")
 	void PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnParams);
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	//Places IA in the world
+	void PlaceAIPawns(TSubclassOf<APawn> ToSpawn, const FSpawnParams SpawnParams);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -57,8 +61,11 @@ private:
 	// Cast a sphere and return true if the sphere hit a object
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
-	//Place an actor in the world
+	// Randomly Place an actor in the world
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, const struct FTransform&);
+
+	// Randomly Place an actor in the world and init is AI controller
+	void PlacePawn(TSubclassOf<APawn> &ToSpawn, const FTransform & SpawnPosition);
 
 	// Get a empty location
 	bool FindEmptyLocation(float Radius,FVector& OutLocation);

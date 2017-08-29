@@ -85,7 +85,13 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnPara
 		PlaceActor(ToSpawn, SpawnPosition);
 	}
 }
-
+void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn,const FSpawnParams SpawnParams)
+{
+	for (const FTransform& SpawnPosition : GenerateSpawnPosition(SpawnParams))
+	{
+		PlacePawn(ToSpawn, SpawnPosition);
+	}
+}
 bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 {
 	FHitResult HitResult;
@@ -121,7 +127,17 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn,const FTransform& SpawnPositi
 		Spawned->SetActorTransform(SpawnPosition);
 	}
 }
-
+void ATile::PlacePawn(TSubclassOf<APawn> &ToSpawn, const FTransform & SpawnPosition)
+{
+	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	if (Spawned)
+	{
+		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		Spawned->SetActorTransform(SpawnPosition);
+		Spawned->SpawnDefaultController();
+		Spawned->Tags.Add(FName("Enemy"));
+	}
+}
 bool ATile::FindEmptyLocation(float Radius, FVector &OutLocation)
 {
 	FBox Bounds = FBox(MinSpawnPoint->RelativeLocation, MaxSpawnPoint->RelativeLocation);
