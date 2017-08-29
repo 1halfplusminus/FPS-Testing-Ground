@@ -16,16 +16,11 @@ public:
 	// Sets default values for this actor's properties
 	ATile();
 
-	// Min of the box for spawning props
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Setup")
-	class UArrowComponent* MinSpawnPoint;
-	// Max of the box for spawning props
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
-	class UArrowComponent* MaxSpawnPoint;
 	// Where the tile gonna be attach
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 	class UArrowComponent* AttachLocation;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	class UBoxComponent* BoxComponent;
 	//Places Actors in the world
 	UFUNCTION(BlueprintCallable,Category="Spawning")
 	void PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnParams);
@@ -44,7 +39,7 @@ public:
 
 	// Get the next title attachement point
 	UFUNCTION(BlueprintCallable)
-	FTransform GetAttachLocation() const;
+	FVector GetAttachLocation() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void UnLock();

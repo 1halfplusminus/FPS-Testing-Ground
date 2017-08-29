@@ -23,16 +23,19 @@ public:
 	UFUNCTION(BlueprintCallable,Category= "Bounds Pool")
 	void PopulateBoundsVolumePool();
 
+	UFUNCTION(BlueprintCallable,Category="Gameplay")
+	void IncreaseScore();
 protected:
 	virtual void BeginPlay() override;
 private:
 
 	//Next tile world transform
-	FTransform NextTileTransform = FTransform::Identity;
+	FVector NextTileLocation = FVector::ZeroVector;
 
 	class UActorPoolComponent* ActorPool;
 	void AddToPool(class ANavMeshBoundsVolume* VolumeToAdd);
 
+	int32 Score;
 };
 
 

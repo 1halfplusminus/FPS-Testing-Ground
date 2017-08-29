@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "ActorPoolComponent.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 ATile::ATile()
@@ -18,16 +19,11 @@ ATile::ATile()
 	ActorPool = nullptr;
 	NavMeshBoundsVolume = nullptr;
 
-	SetRootComponent(CreateDefaultSubobject<USceneComponent>(FName("Shared Root")));
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	SetRootComponent(BoxComponent);
 
-	MinSpawnPoint = CreateDefaultSubobject<UArrowComponent>(FName("FBox Min"));
-	MinSpawnPoint->SetupAttachment(RootComponent);
-
-	MaxSpawnPoint = CreateEditorOnlyDefaultSubobject<UArrowComponent>(FName("FBox Max"));
-	MaxSpawnPoint->SetupAttachment(RootComponent);
-
-	AttachLocation = CreateEditorOnlyDefaultSubobject<UArrowComponent>(FName("Attach Location"));
-	AttachLocation->SetupAttachment(RootComponent);
+	AttachLocation = CreateDefaultSubobject<UArrowComponent>(FName("Attach Location"));
+	AttachLocation->SetupAttachment(BoxComponent);
 	AttachLocation->SetRelativeLocation(FVector(3675.0f,0.0f,0.0f));
 }
 
@@ -35,6 +31,7 @@ ATile::ATile()
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -73,9 +70,9 @@ void ATile::SetActorPool(UActorPoolComponent* ActorPoolToSet)
 	ActorPool = ActorPoolToSet;
 }
 
-FTransform ATile::GetAttachLocation() const
+FVector ATile::GetAttachLocation() const
 {
-	return AttachLocation->GetComponentTransform();
+	return AttachLocation->GetComponentLocation();
 }
 
 void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnParams)
@@ -89,11 +86,11 @@ void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn,const FSpawnParams SpawnPara
 bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 {
 	FHitResult HitResult;
-	FVector GlobalPosition = ActorToWorld().TransformPosition(Location);
+	UE_LOG(LogTemp,Warning,TEXT("can spawn at : %s"),*Location.ToCompactString())
 	bool HasHit = GetWorld()->SweepSingleByChannel(
 		HitResult, 
-		GlobalPosition,
-		GlobalPosition,
+		Location,
+		Location,
 		FQuat::Identity, 
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(Radius)
@@ -102,9 +99,9 @@ bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 	FColor ResultColor = (HasHit)?FColor::Red: FColor::Green;
 	//DrawDebugSphere(
 	//	GetWorld(),
-	//	GlobalPosition,
+	//	Location,
 	//	Radius,
-	//	12,
+	//	24,
 	//	ResultColor,
 	//	true,
 	//	100
@@ -137,9 +134,9 @@ void ATile::PlaceActor(TSubclassOf<APawn> ToSpawn, const FTransform& SpawnPositi
 
 bool ATile::FindEmptyLocation(float Radius, FVector &OutLocation)
 {
-	FBox Bounds = FBox(MinSpawnPoint->RelativeLocation, MaxSpawnPoint->RelativeLocation);
+	FBox Bounds = RootComponent->Bounds.GetBox();
 	//TODO PUT CONST IN HEADER FILE ?
-	const int MAX_ATTEMPS = 20;
+	const int MAX_ATTEMPS = 10;
 	for (size_t NbOfAttemp = 0; NbOfAttemp < MAX_ATTEMPS; NbOfAttemp++)
 	{
 		FVector SpawnPoint = FMath::RandPointInBox(Bounds);

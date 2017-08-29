@@ -7,6 +7,7 @@
 #include "AI/Navigation/NavMeshBoundsVolume.h"
 #include "EngineUtils.h"
 #include "ActorPoolComponent.h"
+#include "Engine/Engine.h"
 
 ATestingGroundGameMode::ATestingGroundGameMode()
 	: Super()
@@ -21,15 +22,14 @@ ATile* ATestingGroundGameMode::SpawnTile()
 	{
 		if (GetWorld())
 		{
-			ATile* Tile = GetWorld()->SpawnActor<ATile>(TileBlueprint);
+			ATile* Tile = GetWorld()->SpawnActor<ATile>(TileBlueprint, NextTileLocation, FRotator::ZeroRotator);
 			if (Tile)
 			{
 				//Give the reference of the actor pool to the tile
 				Tile->SetActorPool(ActorPool);
-				Tile->SetActorTransform(NextTileTransform);
 				Tile->Lock();
 				Tile->PositionNavMeshBoundsVolume();
-				NextTileTransform = Tile->GetAttachLocation();
+				NextTileLocation = Tile->GetAttachLocation();
 			}
 			return Tile;
 		}
@@ -48,7 +48,14 @@ void ATestingGroundGameMode::BeginPlay()
 	SpawnTile();
 	SpawnTile();
 }
-
+void ATestingGroundGameMode::IncreaseScore()
+{
+	Score += 1;
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString(TEXT("Score ")) + FString::FromInt(Score));
+	}
+}
 void ATestingGroundGameMode::AddToPool(ANavMeshBoundsVolume *NavMeshBoundsVolume)
 {
 	if (ActorPool)
