@@ -29,6 +29,7 @@ public:
 	//Places Actors in the world
 	UFUNCTION(BlueprintCallable,Category="Spawning")
 	void PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnParams);
+
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
 	//Places IA in the world
 	void PlaceAIPawns(TSubclassOf<APawn> ToSpawn, const FSpawnParams SpawnParams);
@@ -55,20 +56,18 @@ public:
 
 	void PositionNavMeshBoundsVolume();
 
-	TArray<FTransform> GenerateSpawnPosition(const FSpawnParams&);
-
 private:
 	// Cast a sphere and return true if the sphere hit a object
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
-	// Randomly Place an actor in the world
-	void PlaceActor(TSubclassOf<AActor> ToSpawn, const struct FTransform&);
-
-	// Randomly Place an actor in the world and init is AI controller
-	void PlacePawn(TSubclassOf<APawn> &ToSpawn, const FTransform & SpawnPosition);
-
 	// Get a empty location
 	bool FindEmptyLocation(float Radius,FVector& OutLocation);
+
+	template<class T>
+	void RandomlyPlaceActors(TSubclassOf<T> ToSpawn, const FSpawnParams SpawnParams);
+
+	template<class T>
+	void PlaceActor(TSubclassOf<T> ToSpawn, const FTransform&) = 0;
 
 	// Reference to the actor pool singleton
 	class UActorPoolComponent* ActorPool;

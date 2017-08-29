@@ -80,17 +80,11 @@ FTransform ATile::GetAttachLocation() const
 
 void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn,const FSpawnParams SpawnParams)
 {
-	for(const FTransform& SpawnPosition : GenerateSpawnPosition(SpawnParams))
-	{
-		PlaceActor(ToSpawn, SpawnPosition);
-	}
+	RandomlyPlaceActors(ToSpawn, SpawnParams);
 }
 void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn,const FSpawnParams SpawnParams)
 {
-	for (const FTransform& SpawnPosition : GenerateSpawnPosition(SpawnParams))
-	{
-		PlacePawn(ToSpawn, SpawnPosition);
-	}
+	RandomlyPlaceActors(ToSpawn, SpawnParams);
 }
 bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 {
@@ -118,6 +112,7 @@ bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 	return !HasHit;
 }
 
+template<>
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn,const FTransform& SpawnPosition)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
@@ -127,7 +122,8 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn,const FTransform& SpawnPositi
 		Spawned->SetActorTransform(SpawnPosition);
 	}
 }
-void ATile::PlacePawn(TSubclassOf<APawn> &ToSpawn, const FTransform & SpawnPosition)
+template<>
+void ATile::PlaceActor(TSubclassOf<APawn> ToSpawn, const FTransform& SpawnPosition)
 {
 	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn);
 	if (Spawned)
@@ -138,6 +134,7 @@ void ATile::PlacePawn(TSubclassOf<APawn> &ToSpawn, const FTransform & SpawnPosit
 		Spawned->Tags.Add(FName("Enemy"));
 	}
 }
+
 bool ATile::FindEmptyLocation(float Radius, FVector &OutLocation)
 {
 	FBox Bounds = FBox(MinSpawnPoint->RelativeLocation, MaxSpawnPoint->RelativeLocation);
@@ -156,27 +153,25 @@ bool ATile::FindEmptyLocation(float Radius, FVector &OutLocation)
 	return false;
 }
 
-TArray<FTransform> ATile::GenerateSpawnPosition(const FSpawnParams& SpawnParam)
+template<class T>
+void ATile::RandomlyPlaceActors(TSubclassOf<T> ToSpawn, const FSpawnParams SpawnParams)
 {
-	TArray<FTransform> SpawnPoints;
-	int32 NumberToSpawn = FMath::RandRange(SpawnParam.MinSpawn, SpawnParam.MaxSpawn);
+	int32 NumberToSpawn = FMath::RandRange(SpawnParams.MinSpawn, SpawnParams.MaxSpawn);
 	for (int32 ActorCount = 0; ActorCount < NumberToSpawn; ActorCount++)
 	{
 		FVector Location;
-		FRotator Rot;
-		Rot.Roll = FMath::RandRange(SpawnParam.MinTransform.Rotation.Roll, SpawnParam.MaxTransform.Rotation.Roll);
-		Rot.Pitch = FMath::RandRange(SpawnParam.MinTransform.Rotation.Pitch,SpawnParam.MaxTransform.Rotation.Pitch);
-		Rot.Yaw = FMath::RandRange(SpawnParam.MinTransform.Rotation.Yaw, SpawnParam.MaxTransform.Rotation.Yaw);
-		FVector Scale;
-		Scale.X = FMath::RandRange(SpawnParam.MinTransform.Scale.X, SpawnParam.MaxTransform.Scale.X);
-		Scale.Y = FMath::RandRange(SpawnParam.MinTransform.Scale.Y, SpawnParam.MaxTransform.Scale.Y);
-		Scale.Z = FMath::RandRange(SpawnParam.MinTransform.Scale.Z, SpawnParam.MaxTransform.Scale.Z);
-		FTransform SpawnPosition(Rot,Location,Scale);
-		if (FindEmptyLocation(SpawnParam.CollisionRadius * SpawnPosition.GetScale3D().GetMax(), Location))
+		if (FindEmptyLocation(SpawnParams.CollisionRadius * FMath::Max3(SpawnParams.MaxTransform.Scale.X, SpawnParams.MaxTransform.Scale.Y, SpawnParams.MaxTransform.Scale.Z), Location))
 		{
-			SpawnPosition.SetLocation(Location);
-			SpawnPoints.Add(SpawnPosition);
+			FVector Scale;
+			Scale.X = FMath::RandRange(SpawnParams.MinTransform.Scale.X, SpawnParams.MaxTransform.Scale.X);
+			Scale.Y = FMath::RandRange(SpawnParams.MinTransform.Scale.Y, SpawnParams.MaxTransform.Scale.Y);
+			Scale.Z = FMath::RandRange(SpawnParams.MinTransform.Scale.Z, SpawnParams.MaxTransform.Scale.Z);
+			FRotator Rot;
+			Rot.Roll = FMath::RandRange(SpawnParams.MinTransform.Rotation.Roll, SpawnParams.MaxTransform.Rotation.Roll);
+			Rot.Pitch = FMath::RandRange(SpawnParams.MinTransform.Rotation.Pitch, SpawnParams.MaxTransform.Rotation.Pitch);
+			Rot.Yaw = FMath::RandRange(SpawnParams.MinTransform.Rotation.Yaw, SpawnParams.MaxTransform.Rotation.Yaw);
+			FTransform SpawnPosition(Rot, Location, Scale);
+			PlaceActor(ToSpawn, SpawnPosition);
 		}
 	}
-	return SpawnPoints;
 }
