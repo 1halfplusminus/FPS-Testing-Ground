@@ -48,13 +48,13 @@ void ATestingGroundGameMode::BeginPlay()
 	SpawnTile();
 	SpawnTile();
 }
+FString ATestingGroundGameMode::GetScoreToString()
+{
+	return FString::Printf(TEXT("Score: %i"),Score);
+}
 void ATestingGroundGameMode::IncreaseScore()
 {
 	Score += 1;
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString(TEXT("Score ")) + FString::FromInt(Score));
-	}
 }
 void ATestingGroundGameMode::AddToPool(ANavMeshBoundsVolume *NavMeshBoundsVolume)
 {

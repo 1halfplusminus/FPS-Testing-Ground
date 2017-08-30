@@ -25,6 +25,10 @@ public:
 
 	UFUNCTION(BlueprintCallable,Category="Gameplay")
 	void IncreaseScore();
+
+	// Return the player score
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	FString GetScoreToString();
 protected:
 	virtual void BeginPlay() override;
 private:
