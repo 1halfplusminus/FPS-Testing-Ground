@@ -1,14 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Tile.h"
-#include "Components/ArrowComponent.h"
-#include "Components/SceneComponent.h"
 #include "Engine/World.h"
-#include "SubclassOf.h"
 #include "DrawDebugHelpers.h"
-#include "ActorPoolComponent.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "Components/BoxComponent.h"
+#include "Components/ArrowComponent.h"
+#include "TestingGroundGameMode.h"
+#include "ActorPoolComponent.h"
 
 // Sets default values
 ATile::ATile()
@@ -18,6 +17,7 @@ ATile::ATile()
 
 	ActorPool = nullptr;
 	NavMeshBoundsVolume = nullptr;
+	IsTileConquered = false;
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	SetRootComponent(BoxComponent);
@@ -40,7 +40,6 @@ void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (ActorPool && NavMeshBoundsVolume) {
 		ActorPool->Return(NavMeshBoundsVolume);
 	}
-	UE_LOG(LogTemp,Warning,TEXT("[%s] EndPlay"),*GetName());
 }
 
 // Called every frame
@@ -48,6 +47,22 @@ void ATile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATile::TileConquered()
+{
+	if (IsTileConquered == false)
+	{
+		if (GetWorld())
+		{
+			ATestingGroundGameMode* GameMode = (ATestingGroundGameMode*)GetWorld()->GetAuthGameMode();
+			if (ensure(GameMode != nullptr))
+			{
+				GameMode->IncreaseScore();
+			}
+		}
+		IsTileConquered = true;
+	}
 }
 
 void ATile::PositionNavMeshBoundsVolume()
@@ -58,6 +73,7 @@ void ATile::PositionNavMeshBoundsVolume()
 		NavMeshBoundsVolume = ActorPool->Checkout();
 		if (NavMeshBoundsVolume)
 		{
+			UE_LOG(LogTemp,Warning,TEXT("Nav mesh bound volume %s"),*GetActorLocation().ToCompactString())
 			NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
 			GetWorld()->GetNavigationSystem()->Build();
 		}
@@ -86,7 +102,6 @@ void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn,const FSpawnParams SpawnPara
 bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 {
 	FHitResult HitResult;
-	UE_LOG(LogTemp,Warning,TEXT("can spawn at : %s"),*Location.ToCompactString())
 	bool HasHit = GetWorld()->SweepSingleByChannel(
 		HitResult, 
 		Location,
@@ -112,7 +127,7 @@ bool  ATile::CanSpawnAtLocation(FVector Location, float Radius)
 template<>
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn,const FTransform& SpawnPosition)
 {
-	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
+	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn, SpawnPosition.GetLocation(), FRotator::ZeroRotator);
 	if (Spawned)
 	{
 		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
@@ -122,7 +137,7 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn,const FTransform& SpawnPositi
 template<>
 void ATile::PlaceActor(TSubclassOf<APawn> ToSpawn, const FTransform& SpawnPosition)
 {
-	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn,SpawnPosition.GetLocation(),FRotator::ZeroRotator);
 	if (Spawned)
 	{
 		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));

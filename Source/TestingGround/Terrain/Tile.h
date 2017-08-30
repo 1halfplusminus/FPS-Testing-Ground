@@ -37,6 +37,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
+	// Conquere the tile and increase the score
+	UFUNCTION(BlueprintCallable, category = "Gameplay")
+	void TileConquered();
+
 	// Get the next title attachement point
 	UFUNCTION(BlueprintCallable)
 	FVector GetAttachLocation() const;
@@ -50,7 +55,6 @@ public:
 	void SetActorPool(class UActorPoolComponent*);
 
 	void PositionNavMeshBoundsVolume();
-
 private:
 	// Cast a sphere and return true if the sphere hit a object
 	bool CanSpawnAtLocation(FVector Location, float Radius);
@@ -69,4 +73,7 @@ private:
 
 	// reference to the NavMeshBoundsVolume get from the pool. This thing need to be returned on end play
 	class AActor* NavMeshBoundsVolume;
+
+	// return true if the tile have been conquered
+	bool IsTileConquered;
 };

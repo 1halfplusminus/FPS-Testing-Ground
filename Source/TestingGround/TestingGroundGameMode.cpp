@@ -53,7 +53,7 @@ void ATestingGroundGameMode::IncreaseScore()
 	Score += 1;
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString(TEXT("Score ")) + FString::FromInt(Score));
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString(TEXT("Score ")) + FString::FromInt(Score));
 	}
 }
 void ATestingGroundGameMode::AddToPool(ANavMeshBoundsVolume *NavMeshBoundsVolume)
