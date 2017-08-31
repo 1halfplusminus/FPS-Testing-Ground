@@ -94,8 +94,8 @@ void  ATestingGroundCharacter::OnDamage(AActor* DamagedActor, float Damage, cons
 		DetachFromControllerPendingDestroy();
 		FPMesh->SetVisibility(false, true);
 	}
+	TakeDamage();
 }
-
 void ATestingGroundCharacter::PullTrigger()
 {
 	if (Gun)
