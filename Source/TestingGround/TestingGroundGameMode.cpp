@@ -52,6 +52,10 @@ FString ATestingGroundGameMode::GetScoreToString()
 {
 	return FString::Printf(TEXT("Score: %i"),Score);
 }
+int32 ATestingGroundGameMode::GetScore()
+{
+	return Score;
+}
 void ATestingGroundGameMode::IncreaseScore()
 {
 	Score += 1;
