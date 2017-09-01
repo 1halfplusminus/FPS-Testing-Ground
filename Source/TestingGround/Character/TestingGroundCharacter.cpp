@@ -73,28 +73,6 @@ void ATestingGroundCharacter::BeginPlay()
 	}
 }
 
-// Called every frame
-void ATestingGroundCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-// Called to bind functionality to input
-void ATestingGroundCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this, &ATestingGroundCharacter::PullTrigger);
-}
-
-
-void ATestingGroundCharacter::UnPossessed()
-{
-	Super::UnPossessed();
-	if (Gun)
-	{
-		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-	}
-}
 
 void  ATestingGroundCharacter::OnDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
@@ -115,8 +93,8 @@ void  ATestingGroundCharacter::OnDamage(AActor* DamagedActor, float Damage, cons
 				}
 
 			}
-			//DetachFromControllerPendingDestroy();
 			FPMesh->SetVisibility(false, true);
+			DetachFromControllerPendingDestroy();
 		}
 		TakeDamage();
 	}
@@ -149,5 +127,38 @@ bool ATestingGroundCharacter::IsDead()
 	else 
 	{
 		return false;
+	}
+}
+
+
+// Called every frame
+void ATestingGroundCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+// Called to bind functionality to input
+void ATestingGroundCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ATestingGroundCharacter::PullTrigger);
+}
+
+void ATestingGroundCharacter::PossessedBy(AController * NewController)
+{
+	Super::PossessedBy(NewController);
+	APlayerController* PlayerController = Cast<APlayerController>(NewController);
+	if (PlayerController)
+	{
+		PlayerController->SetViewTarget(FPCamera->GetAttachmentRootActor());
+		FPCamera->Activate();
+	}
+}
+void ATestingGroundCharacter::UnPossessed()
+{
+	Super::UnPossessed();
+	if (Gun)
+	{
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 	}
 }
