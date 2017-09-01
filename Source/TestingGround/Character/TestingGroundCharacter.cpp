@@ -9,9 +9,12 @@
 #include "SubclassOf.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Controller.h"
-
 #include "EngineGlobals.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
+#include "Camera/CameraActor.h"
+#include "Components/ArrowComponent.h"
+
 // Sets default values
 ATestingGroundCharacter::ATestingGroundCharacter()
 {
@@ -40,6 +43,13 @@ ATestingGroundCharacter::ATestingGroundCharacter()
 	FPMesh->CastShadow = false;
 	FPMesh->bCastDynamicShadow = false;
 	FPMesh->SetupAttachment(FPCamera);
+
+
+	//TODO Find a sensible default
+	//Death camera position
+	DeathCameraSpawn = CreateDefaultSubobject<UArrowComponent>(TEXT("DeathCamera spawn point"));
+	DeathCameraSpawn->SetupAttachment(RootComponent);
+
 	// Default value
 	Health = 100;
 }
@@ -88,13 +98,28 @@ void ATestingGroundCharacter::UnPossessed()
 
 void  ATestingGroundCharacter::OnDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	Health = FMath::Max<int32>(Health - Damage,0);
-	if (IsDead())
-	{ 
-		DetachFromControllerPendingDestroy();
-		FPMesh->SetVisibility(false, true);
+	if (!IsDead())
+	{
+		Health = (Health - Damage >= 0) ? Health - Damage : 0;
+		if (IsDead())
+		{
+			APlayerController* Controller = Cast<APlayerController>(GetController());
+			// TODO assertion
+			if (Controller && GetWorld())
+			{
+				// TODO Assertion
+				ACameraActor* DeathCamera = GetWorld()->SpawnActor<ACameraActor>(DeathCameraSpawn->GetComponentLocation(), DeathCameraSpawn->GetComponentRotation());
+				if (DeathCamera)
+				{
+					Controller->SetViewTargetWithBlend(DeathCamera, 1.0f);
+				}
+
+			}
+			//DetachFromControllerPendingDestroy();
+			FPMesh->SetVisibility(false, true);
+		}
+		TakeDamage();
 	}
-	TakeDamage();
 }
 void ATestingGroundCharacter::PullTrigger()
 {

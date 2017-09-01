@@ -41,6 +41,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsDead();
 protected:
+	/** Death Camera spawn point */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Gun")
+	class UArrowComponent* DeathCameraSpawn;
 
 	/** Third person camera */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
@@ -60,7 +63,6 @@ protected:
 	/** Instance of the gun used by the character */
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Gun")
 	class AGun* Gun;
-
 	/** AnimMontage to play for the first person*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup", meta = (DisplayName = "Third Person Animation"))
 	class UAnimMontage* TPFireAnimation;
